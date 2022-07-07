@@ -34,26 +34,20 @@ class MainActivity : AppCompatActivity() {
         webSettings.javaScriptEnabled = true
 
         findViewById<Button>(R.id.next).setOnClickListener {
-            if (ids.isNotEmpty())
+            if (ids.isNotEmpty()){
                 currentItem++
                 if (ids.size > currentItem){
                     getItem(ids[currentItem].id)
                 } else {
                     currentItem = 0
-                    getItem(ids[currentItem].id)
+                    getItem(ids[0].id)
                 }
+            } else {
+                getIds()
+            }
         }
 
-        Thread {
-            val url = baseUrl + "entities/getAllIds"
-            try {
-                val idsResp = Gson().fromJson(httpRequest(url) ?: "", Ids::class.java)
-                ids = idsResp!!.data
-                getItem(ids[0].id)
-            } catch (e: Exception) {
-                println(e)
-            }
-        }.start()
+        getIds()
     }
 
     private fun httpRequest(url: String): String? {
@@ -108,6 +102,19 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             } catch (e: Exception){
+                println(e)
+            }
+        }.start()
+    }
+
+    private fun getIds(){
+        Thread {
+            val url = baseUrl + "entities/getAllIds"
+            try {
+                val idsResp = Gson().fromJson(httpRequest(url) ?: "", Ids::class.java)
+                ids = idsResp!!.data
+                getItem(ids[0].id)
+            } catch (e: Exception) {
                 println(e)
             }
         }.start()
